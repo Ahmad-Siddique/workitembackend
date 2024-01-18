@@ -63,6 +63,7 @@ app.use(
       "https://mern-stack-app-come-to-me.onrender.com",
       "https://exhibitors.prointegrationfuture.asia",
       "https://office-frontend-work-item.onrender.com",
+      "https://www.office-frontend-work-item.onrender.com",
     ],
   })
 );
