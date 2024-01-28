@@ -57,7 +57,7 @@ const workitemOneController = asyncHandler(async (req, res) => {
     .populate("materials.material")
     .populate("labour.labour")
     .populate("equipment.equipment");;
-  console.log(workitem);
+  // console.log(workitem);
   if (workitem) {
     res.json(workitem);
   } else {
@@ -109,12 +109,78 @@ const workitemUpdateController = asyncHandler(async (req, res) => {
 
 
 const testingController = asyncHandler(async (req, res) => {
-  try {
-    const { workItemId, quantity } = req.body; // Assuming you receive workItemId and quantity in the request body
+  // try {
+  //   const { workItemId, quantity } = req.body; // Assuming you receive workItemId and quantity in the request body
 
-    // Find the work item by its ID and populate the materials, equipment, and labor fields
+  //   // Find the work item by its ID and populate the materials, equipment, and labor fields
+  //   const workItem = await workitemModel
+  //     .findById(workItemId)
+  //     .populate("materials.material")
+  //     .populate("labour.labour")
+  //     .populate("equipment.equipment");
+
+  //   if (!workItem) {
+  //     return res.status(404).json({ message: "Work item not found" });
+  //   }
+
+  //   // Calculate quantities for each material, labor, and equipment item separately
+  //   const materialQuantities = [];
+  //   const laborQuantities = [];
+  //   const equipmentQuantities = [];
+
+  //   for (const material of workItem.materials) {
+  //     const materialQuantity = material.quantity * quantity;
+  //     const materialRate = material.rate * quantity;
+  //     materialQuantities.push({
+  //       material: material.material,
+  //       quantity: materialQuantity,
+  //       rate:materialRate
+  //     });
+  //   }
+
+  //   for (const labor of workItem.labour) {
+  //     const laborQuantity = labor.quantity * quantity;
+  //     const laborRate = labor.rate * quantity;
+  //     laborQuantities.push({ labor: labor.labor, quantity: laborQuantity });
+  //   }
+
+  //   for (const equipment of workItem.equipment) {
+  //     const equipmentQuantity = equipment.quantity * quantity;
+  //     equipmentQuantities.push({
+  //       equipment: equipment.equipment,
+  //       quantity: equipmentQuantity,
+  //     });
+  //   }
+
+  //   // Construct the response object containing quantities for each category
+  //   const quantities = {
+  //     materials: materialQuantities,
+  //     labor: laborQuantities,
+  //     equipment: equipmentQuantities,
+  //   };
+
+  //   res.status(200).json(quantities);
+  // } catch (error) {
+  //   console.error(error);
+  //   res.status(500).json({ message: "Server error" });
+  // }
+
+
+
+
+
+
+
+
+
+
+  try {
+    // const { id } = req.params;
+    const { quantity: inputQuantity, id } = req.body; // Quantity from request body
+    console.log("JHEHEHEHEH")
+    // Find the work item and populate the related fields
     const workItem = await workitemModel
-      .findById(workItemId)
+      .findById(id)
       .populate("materials.material")
       .populate("labour.labour")
       .populate("equipment.equipment");
@@ -123,46 +189,43 @@ const testingController = asyncHandler(async (req, res) => {
       return res.status(404).json({ message: "Work item not found" });
     }
 
-    // Calculate quantities for each material, labor, and equipment item separately
-    const materialQuantities = [];
-    const laborQuantities = [];
-    const equipmentQuantities = [];
+    // Calculate totals
+    let materialTotals = [],
+      equipmentTotals = [],
+      labourTotals = [];
+    let grandTotal = 0;
 
-    for (const material of workItem.materials) {
-      const materialQuantity = material.quantity * quantity;
-      const materialRate = material.rate * quantity;
-      materialQuantities.push({
-        material: material.material,
-        quantity: materialQuantity,
-        rate:materialRate
-      });
-    }
+    workItem.materials.forEach((item) => {
+      const rate = parseFloat(item.material.rate); // Assuming 'rate' is stored as a string
+      const total = item.quantity * rate * inputQuantity;
+      materialTotals.push(total);
+      grandTotal += total;
+    });
 
-    for (const labor of workItem.labour) {
-      const laborQuantity = labor.quantity * quantity;
-      const laborRate = labor.rate * quantity;
-      laborQuantities.push({ labor: labor.labor, quantity: laborQuantity });
-    }
+    workItem.equipment.forEach((item) => {
+      const rate = parseFloat(item.equipment.rate);
+      const total = item.quantity * rate * inputQuantity;
+      equipmentTotals.push(total);
+      grandTotal += total;
+    });
 
-    for (const equipment of workItem.equipment) {
-      const equipmentQuantity = equipment.quantity * quantity;
-      equipmentQuantities.push({
-        equipment: equipment.equipment,
-        quantity: equipmentQuantity,
-      });
-    }
+    workItem.labour.forEach((item) => {
+      const rate = parseFloat(item.labour.rate);
+      const total = item.quantity * rate * inputQuantity;
+      labourTotals.push(total);
+      grandTotal += total;
+    });
 
-    // Construct the response object containing quantities for each category
-    const quantities = {
-      materials: materialQuantities,
-      labor: laborQuantities,
-      equipment: equipmentQuantities,
-    };
-
-    res.status(200).json(quantities);
+    // Respond with the calculated totals
+    res.json({
+      materialTotals,
+      equipmentTotals,
+      labourTotals,
+      grandTotal,
+      workItem
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: error.message });
   }
 
 })
