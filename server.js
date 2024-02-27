@@ -7,6 +7,7 @@ const materialRouter = require("./Routes/materialRoute");
 const labourRouter = require("./Routes/labourRoute");
 const equipmentRouter = require("./Routes/equipmentRoute");
 const workitemRouter = require("./Routes/workitemRoute");
+const generalItemsRouter = require("./Routes/generalItemsRoute");
 
 const path = require("path");
 const serverstate = "Production";
@@ -153,6 +154,7 @@ app.use("/api/material", materialRouter);
 app.use("/api/labour", labourRouter);
 app.use("/api/equipment", equipmentRouter);
 app.use("/api/workitem", workitemRouter);
+app.use("/api/generalitems", generalItemsRouter);
 
 // app.use(taskRouter);
 

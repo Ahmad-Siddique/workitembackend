@@ -46,6 +46,20 @@ const workitem = new Schema(
         },
       },
     ],
+
+    generalitems: [
+      {
+        generalitems: {
+          type: Schema.Types.ObjectId,
+          ref: "generalitems",
+          required: true,
+        },
+        quantity: {
+          type: Number,
+          required: true,
+        },
+      },
+    ],
   },
   { timestamps: true }
 );

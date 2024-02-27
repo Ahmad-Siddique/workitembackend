@@ -4,7 +4,7 @@ const asyncHandler = require("express-async-handler");
 
 const workitemAddController = asyncHandler(async (req, res) => {
   console.log("Add workitem accepted");
-  const { name, materials, labour, equipment } = req.body;
+  const { name, materials, labour, equipment,generalitems } = req.body;
   console.log(req.body);
   // const userfound = await workitemModel.findOne({ code });
   // if (userfound) {
@@ -17,6 +17,7 @@ const workitemAddController = asyncHandler(async (req, res) => {
     materials,
     labour,
     equipment,
+    generalitems
   });
 
   if (workitemcreate) {
@@ -26,7 +27,7 @@ const workitemAddController = asyncHandler(async (req, res) => {
       materials: workitemcreate.materials,
       labour: workitemcreate.labour,
       equipment: workitemcreate.equipment,
-     
+      generalitems: workitemcreate.generalitems,
     });
   } else {
     throw new Error("workitem Not Created");
@@ -86,7 +87,7 @@ const workitemDeleteController = asyncHandler(async (req, res) => {
 
 const workitemUpdateController = asyncHandler(async (req, res) => {
   console.log("Req accepted");
-  const { name, materials, labour, equipment } = req.body;
+  const { name, materials, labour, equipment, generalitems } = req.body;
   const id = req.params.id;
   console.log(req.body);
   const workitem = await workitemModel.findById(id);
@@ -95,6 +96,7 @@ const workitemUpdateController = asyncHandler(async (req, res) => {
     workitem.name = name;
     workitem.materials = materials;
     workitem.labour = labour;
+    workitem.generalitems = generalitems;
     workitem.equipment = equipment;
     
 
@@ -183,7 +185,8 @@ const testingController = asyncHandler(async (req, res) => {
       .findById(id)
       .populate("materials.material")
       .populate("labour.labour")
-      .populate("equipment.equipment");
+      .populate("equipment.equipment")
+      .populate("generalitems.generalitems");
 
     if (!workItem) {
       return res.status(404).json({ message: "Work item not found" });
@@ -193,6 +196,7 @@ const testingController = asyncHandler(async (req, res) => {
     let materialTotals = [],
       equipmentTotals = [],
       labourTotals = [];
+    generalItemsTotals = [];
     let grandTotal = 0;
 
     workItem.materials.forEach((item) => {
